@@ -27,6 +27,8 @@ Intake, [Eligibility](https://github.com/orgs/CodeYourFuture/projects/129/views/
 
 [Curricula](https://github.com/orgs/CodeYourFuture/projects/129/views/7)
 
+(Join the conversation on #cyf-syllabus-tech, #cyf-syllabus-pd, #cyf-final-projects, #cyf-products...) 
+
 ### How we test this
 
 [Quality, Graduation](https://github.com/orgs/CodeYourFuture/projects/129/views/6)
