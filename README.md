@@ -1,4 +1,4 @@
-# 👋 Hello from @SallyMcGrath @kfklein15 @Dedekind561 and @MarianaVazquezCYF 
+# 👋 Hello from @SallyMcGrath @kfklein15 @AmyCYF and @ShaunCYFSA
 
 ## We are the [Programme Team ](https://github.com/orgs/CodeYourFuture/teams/cyf-programme-team). This means:
 
