@@ -35,8 +35,14 @@ class PR {
 
 export async function fetchPrs() {
     const prs = [];
+    const responsePromises = [];
     for (const module of modules) {
-        let response = await fetch(`https://github-issue-proxy.illicitonion.com/cached/120/repos/CodeYourFuture/${module}/pulls`);
+        responsePromises.push(fetch(`https://github-issue-proxy.illicitonion.com/cached/120/repos/CodeYourFuture/${module}/pulls`));
+    }
+    const responses = await Promise.all(responsePromises);
+    for (let i = 0; i < responses.length; i++) {
+        const module = modules[i];
+        const response = responses[i];
         for (const pr of await response.json()) {
             if (pr.state !== "open") {
                 continue;
