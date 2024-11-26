@@ -1,29 +1,3 @@
-const modules = [
-    "Module-User-Focused-Data",
-    "Module-Structuring-And-Testing-Data",
-    "Module-Data-Groups",
-    "Module-Data-Flows",
-];
-const ageToEmoji = {
-    "this week": "🟢",
-    "this month": "🟠",
-    "old": "🔴",
-};
-const now = new Date();
-
-class PR {
-    constructor(url, number, userName, userUrl, title, module, createdAge, updatedAge) {
-        this.url = url;
-        this.number = number;
-        this.userName = userName;
-        this.userUrl = userUrl;
-        this.title = title;
-        this.module = module;
-        this.createdAge = createdAge;
-        this.updatedAge = updatedAge;
-    }
-}
-
 const awaitingReviewByAge = {};
 const prsByModule = {};
 
@@ -41,6 +15,12 @@ function badness(name, count) {
     return 400;
 }
 
+const ageToEmoji = {
+    "this week": "🟢",
+    "this month": "🟠",
+    "old": "🔴",
+};
+
 function computeStatusClass(awaitingReview) {
     const score = Math.max(...Object.entries(awaitingReview).map(([name, count]) => badness(name, count)));
     if (score === 900) {
@@ -52,20 +32,7 @@ function computeStatusClass(awaitingReview) {
     }
 }
 
-function daysToMilliseconds(days) {
-    return days * 24 * 60 * 60 * 1000;
-}
-
-function identifyAge(date) {
-    const millis = now - date;
-    if (millis < daysToMilliseconds(7)) {
-        return "this week";
-    } else if (millis < daysToMilliseconds(7 * 4)) {
-        return "this month";
-    } else {
-        return "old";
-    }
-}
+import { fetchPrs, modules } from "./common.mjs";
 
 async function onLoad() {
     for (const module of modules) {
@@ -75,25 +42,13 @@ async function onLoad() {
             "old": 0,
         };
         prsByModule[module] = [];
+    }
 
-        let response = await fetch(`https://github-issue-proxy.illicitonion.com/cached/1/repos/CodeYourFuture/${module}/pulls`);
-        let prs = await response.json();
-
-        for (const pr of prs) {
-            if (pr.state !== "open") {
-                continue;
-            }
-            const needsReview = pr.labels.some((label) => label.name === "Needs Review");
-            if (!needsReview) {
-                continue;
-            }
-            const createdAt = new Date(Date.parse(pr["created_at"]));
-            const updatedAt = new Date(Date.parse(pr["updated_at"]));
-
-            const prObj = new PR(pr.html_url, pr.number, pr.user.login, pr.user.html_url, pr.title, module, identifyAge(createdAt), identifyAge(updatedAt));
-            awaitingReviewByAge[module][prObj.updatedAge]++;
-            prsByModule[module].push(prObj);
-        }
+    for (const pr of await fetchPrs()) {
+        awaitingReviewByAge[pr.module][pr.updatedAge]++;
+        prsByModule[pr.module].push(pr);
+    }
+    for (const module of modules) {
         prsByModule[module].sort((l, r) => {
             if (l.updatedAge > r.updatedAge) {
                 return 1;
@@ -116,12 +71,10 @@ async function onLoad() {
         for (const [age, count] of Object.entries(awaitingReview)) {
             const bucket = overviewCard.querySelector(`.age-bucket.${age.replaceAll(" ", "-")} .count`);
             bucket.innerText = count;
-            console.log(`badness(${age}, ${count}) = ${badness(age, count)}`);
             if (badness(age, count) === 900) {
                 bucket.classList.add("problem");
             }
         }
-        //`${} / ${awaitingReview["this month"]} / ${awaitingReview["old"]}`;
         overviewCard.querySelector(".overview-card").classList.add(computeStatusClass(awaitingReview));
         document.querySelector("#overview").appendChild(overviewCard);
 
