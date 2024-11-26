@@ -21,7 +21,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
         }
-        .age-bucket .count {
+        .age-bucket .count.problem {
             font-weight: bolder;
         }
         .status-bad {
@@ -48,8 +48,8 @@
                     PRs needing review from:
                     <div class="age-container">
                         <div class="age-bucket this-week">This week<br /><span class="count"></span></div>
-                        <div class="age-bucket this-month">This month<br /><span class="count"></span></div>
-                        <div class="age-bucket old">Older<br /><span class="count"></span></div>
+                        <div class="age-bucket this-month">2-4 weeks ago<br /><span class="count"></span></div>
+                        <div class="age-bucket old">4+ weeks ago<br /><span class="count"></span></div>
                     </div>
                 <div class="summary-values"></div>
             </div>

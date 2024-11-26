@@ -27,10 +27,25 @@ class PR {
 const awaitingReviewByAge = {};
 const prsByModule = {};
 
+// 400/700/900
+function badness(name, count) {
+    if ((name === "old" || name == "this month") && count > 0) {
+        return 900;
+    }
+    if (name === "this week" && count > 20) {
+        return 900;
+    }
+    if (name === "this week" && count > 10) {
+        return 700;
+    }
+    return 400;
+}
+
 function computeStatusClass(awaitingReview) {
-    if (awaitingReview["old"] > 0 || awaitingReview["this month"] > 0 || awaitingReview["this week"] > 20) {
+    const score = Math.max(...Object.entries(awaitingReview).map(([name, count]) => badness(name, count)));
+    if (score === 900) {
         return "status-bad";
-    } else if (awaitingReview["this week"] > 10) {
+    } else if (score === 700) {
         return "status-medium";
     } else {
         return "status-good";
@@ -99,7 +114,12 @@ async function onLoad() {
         const overviewCard = document.querySelector("template.overview-card").content.cloneNode(true);
         overviewCard.querySelector(".module").innerText = `${module} (${totalPending})`;
         for (const [age, count] of Object.entries(awaitingReview)) {
-            overviewCard.querySelector(`.age-bucket.${age.replaceAll(" ", "-")} .count`).innerText = count;
+            const bucket = overviewCard.querySelector(`.age-bucket.${age.replaceAll(" ", "-")} .count`);
+            bucket.innerText = count;
+            console.log(`badness(${age}, ${count}) = ${badness(age, count)}`);
+            if (badness(age, count) === 900) {
+                bucket.classList.add("problem");
+            }
         }
         //`${} / ${awaitingReview["this month"]} / ${awaitingReview["old"]}`;
         overviewCard.querySelector(".overview-card").classList.add(computeStatusClass(awaitingReview));
