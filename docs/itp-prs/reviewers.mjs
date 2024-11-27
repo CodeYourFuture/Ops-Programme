@@ -37,6 +37,7 @@ async function onLoad() {
         const daysSinceLastReview = Math.abs(Math.floor((reviewerDetails.latestCommentTime - new Date()) / (1000 * 60 * 60 * 24)));
         const card = document.querySelector("template.reviewer-card").content.cloneNode(true);
         card.querySelector(".username").innerText = userName;
+        card.querySelector(".username").href = `https://github.com/${userName}`;
         card.querySelector(".last-review").innerText = toIsoDate(reviewerDetails.latestCommentTime);
         card.querySelector(".days-since-last-review").innerText = daysSinceLastReview;
         card.querySelector(".total-reviewed-prs").innerText = reviewerDetails.prs.size;
