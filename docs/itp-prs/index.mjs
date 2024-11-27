@@ -44,7 +44,7 @@ async function onLoad() {
         prsByModule[module] = [];
     }
 
-    for (const pr of await fetchPrs()) {
+    for (const pr of (await fetchPrs()).filter((pr) => pr.status === "Needs Review")) {
         awaitingReviewByAge[pr.module][pr.updatedAge]++;
         prsByModule[pr.module].push(pr);
     }

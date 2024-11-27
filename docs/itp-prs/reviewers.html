@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ITP PRs needing review</title>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&amp;family=Raleway:wght@300;600;800;900&amp;family=Lato:wght@500;800&amp;display=swap" rel="stylesheet" media="all" onload="this.media=&quot;all&quot;">
+        <meta charset="UTF-8">
+        <style type="text/css">
+        body {
+            font-family: Raleway, sans-serif;
+        }
+        #container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 40px;
+        }
+        .reviewer-card {
+            border: 1px black solid;
+            padding: 5px;
+        }
+        .reviewer-card.super-active {
+            background-color: lightgreen;
+        }
+        .reviewer-card.inactive {
+            background-color: lightslategrey;
+        }
+        </style>
+    </head>
+    <body>
+        <h1>ITP reviewers</h1>
+        <div id="container">Loading...</div>
+
+        <script type="module" src="reviewers.mjs"></script>
+
+        <template class="reviewer-card">
+            <div class="reviewer-card">
+                <h3 class="username"></h3>
+                <div><span class="total-reviewed-prs"></span> reviewed PRs</div>
+                <div>Days since last review: <span class="days-since-last-review"></span></div>
+                <div>Last review: <span class="last-review"></span></div>
+            </div>
+        </template>
+    </body>
+</html>
