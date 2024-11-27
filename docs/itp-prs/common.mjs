@@ -61,13 +61,13 @@ export async function fetchPrs() {
     const prs = [];
     const responsePromises = [];
     for (const module of modules) {
-        responsePromises.push(fetch(`https://github-issue-proxy.illicitonion.com/cached/120/repos/CodeYourFuture/${module}/pulls?state=all`));
+        responsePromises.push(fetch(`https://github-issue-proxy.illicitonion.com/cached/120/repos/CodeYourFuture/${module}/pulls?state=all`).then((response) => response.json()));
     }
-    const responses = await Promise.all(responsePromises);
-    for (let i = 0; i < responses.length; i++) {
+    const responsesByModule = await Promise.all(responsePromises);
+    for (let i = 0; i < responsesByModule.length; i++) {
         const module = modules[i];
-        const response = responses[i];
-        for (const pr of await response.json()) {
+        const responsePrs = responsesByModule[i];
+        for (const pr of responsePrs) {
             const status = getStatus(pr.state, pr.labels);
             const createdAt = new Date(Date.parse(pr["created_at"]));
             const updatedAt = new Date(Date.parse(pr["updated_at"]));
@@ -80,18 +80,35 @@ export async function fetchPrs() {
 
 export async function fetchPrsWithComments() {
     const prsList = await fetchPrs();
+
+    const reviewPromises = [];
+
     const prs = {};
     for (const pr of prsList) {
         prs[pr.url] = pr;
+        reviewPromises.push(fetch(`https://github-issue-proxy.illicitonion.com/cached/120/repos/CodeYourFuture/${pr.module}/pulls/${pr.number}/reviews`).then((response) => response.json()));
     }
+
+    const responsesByModule = [];
     for (const module of modules) {
-        const response = await fetch(`https://github-issue-proxy.illicitonion.com/cached/120/repos/CodeYourFuture/${module}/pulls/comments`);
-        const responseObjects = await response.json();
-        for (const comment of responseObjects) {
+        responsesByModule.push(fetch(`https://github-issue-proxy.illicitonion.com/cached/120/repos/CodeYourFuture/${module}/pulls/comments`).then((response) => response.json()));
+    }
+    for (const moduleResponses of await Promise.all(responsesByModule)) {
+        for (const comment of moduleResponses) {
             const pr_url = comment.html_url.split("#")[0];
             const pr = prs[pr_url];
             pr.comments.push(new Comment(comment.user.login, comment.user.login === pr.userName, new Date(Date.parse(comment.created_at))));
         }
     }
+
+    for (const reviews of await Promise.all(reviewPromises)) {
+        console.log(reviews);
+        for (const review of reviews) {
+            const pr_url = review.html_url.split("#")[0];
+            const pr = prs[pr_url];
+            pr.comments.push(new Comment(review.user.login, review.user.login === pr.userName, new Date(Date.parse(review.submitted_at))));
+        }
+    }
+
     return prsList;
 }
