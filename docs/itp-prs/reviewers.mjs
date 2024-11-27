@@ -32,6 +32,7 @@ async function onLoad() {
         .sort(([_l, l], [_r, r]) => {
             return r.latestCommentTime - l.latestCommentTime;
         });
+    document.querySelector("#reviewer-count").innerText = `(${sortedReviewers.length})`;
     for (const [userName, reviewerDetails] of sortedReviewers) {
         const daysSinceLastReview = Math.abs(Math.floor((reviewerDetails.latestCommentTime - new Date()) / (1000 * 60 * 60 * 24)));
         const card = document.querySelector("template.reviewer-card").content.cloneNode(true);
