@@ -46,6 +46,13 @@ async function onLoad() {
         card.querySelector(".days-since-last-review").innerText = daysSinceLastReview;
         card.querySelector(".days-in-last-28").innerText = reviewerDetails.recentReviewDays.size;
         card.querySelector(".total-reviewed-prs").innerText = reviewerDetails.prs.size;
+        for (const pr of reviewerDetails.prs) {
+            const li = document.createElement("li");
+            const parts = pr.split("/");
+            const linkText = parts.length === 7 ? `${parts[4]} #${parts[6]}` : pr;
+            li.innerHTML = `<a href="${pr}">${linkText}</a>`;
+            card.querySelector(".pr-list").appendChild(li);
+        }
         if (daysSinceLastReview > 28) {
             card.querySelector(".reviewer-card").classList.add("inactive");
         } else if (daysSinceLastReview < 14 && reviewerDetails.prs.size > 10) {
