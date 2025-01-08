@@ -68,6 +68,11 @@ export async function fetchPrs() {
         const module = modules[i];
         const responsePrs = responsesByModule[i];
         for (const pr of responsePrs) {
+            // Deleted users end up as null.
+            if (!pr.user) {
+                continue;
+            }
+
             const status = getStatus(pr.state, pr.labels);
             const createdAt = new Date(Date.parse(pr["created_at"]));
             const updatedAt = new Date(Date.parse(pr["updated_at"]));
@@ -95,6 +100,10 @@ export async function fetchPrsWithComments() {
     }
     for (const moduleResponses of await Promise.all(responsesByModule)) {
         for (const comment of moduleResponses) {
+            // Deleted users end up as null.
+            if (!comment.user) {
+                continue;
+            }
             const pr_url = comment.html_url.split("#")[0];
             const pr = prs[pr_url];
             pr.comments.push(new Comment(comment.user.login, comment.user.login === pr.userName, new Date(Date.parse(comment.created_at))));
@@ -102,8 +111,11 @@ export async function fetchPrsWithComments() {
     }
 
     for (const reviews of await Promise.all(reviewPromises)) {
-        console.log(reviews);
         for (const review of reviews) {
+            // Deleted users end up as null.
+            if (!review.user) {
+                continue;
+            }
             const pr_url = review.html_url.split("#")[0];
             const pr = prs[pr_url];
             pr.comments.push(new Comment(review.user.login, review.user.login === pr.userName, new Date(Date.parse(review.submitted_at))));
