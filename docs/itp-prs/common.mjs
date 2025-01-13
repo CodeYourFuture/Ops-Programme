@@ -14,6 +14,7 @@ function identifyAge(date) {
 }
 
 export const modules = [
+    "Module-Onboarding",
     "Module-User-Focused-Data",
     "Module-Structuring-And-Testing-Data",
     "Module-Data-Groups",
